@@ -33,6 +33,7 @@ def negotiate1(raw_json, cheap_hotel, cheapest_price):
         cheapest_price = cheapest_price[:pos]
 
     original_price = raw_json['entities'][0]['resolution']['value']
+    original_price = original_price.replace('$', '')
     pos = str(original_price).find('.')
     if pos > -1:
         original_price =  str(original_price[:pos])
