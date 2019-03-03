@@ -12,8 +12,6 @@ def ask_for_price(hotel_date):
 
     hotel_date = datetime.strptime(hotel_date, '%m-%d-%Y')
 
-    
-
     if days[-1] == '1':
         days += 'st'
     elif days[-1] == '2':
@@ -23,15 +21,8 @@ def ask_for_price(hotel_date):
     else:
         days += 'th'
 
-    
-
     message = "Hey, I'm looking for a hotel room on the " + days + " of " + hotel_date.strftime('%B') + ". What are you guys charging per night?"
-    
-    status = 1
-
-    if intent == 'No':
-        message, status = final_no()
-    return message, status
+    return message
 
 
 
@@ -44,21 +35,17 @@ def negotiate1(raw_json, cheap_hotel, cheapest_price):
 
     original_price = raw_json['entities'][0]['resolution']['value']
 
-
     cheap_hotel = "best Western"
     cheapest_price = "100 dollars"
     current_price = str(int(original_price) * 0.8)
     
-
     pos = current_price.find('.')
     current_price = int(current_price[:pos]) 
     current_price -= current_price%5
 
-
     message = "Well, " + cheap_hotel + " down the road is charging " + cheapest_price + ", can you do something like " + str(current_price) + " dollars?"
     status = 1
     return message, status
-
 
 
 def negotiate2(raw_json, customer_name, current_price, original_price):
@@ -84,7 +71,6 @@ def negotiate2(raw_json, customer_name, current_price, original_price):
         return message, current_price, status
 
 
-
 def final_attempt(raw_json, customer_name):
     # This is it, just a yes or a no!
     raw_json = json.loads(raw_json)
@@ -92,7 +78,6 @@ def final_attempt(raw_json, customer_name):
     
     if intent == 'Yes':
         message, status = agreement(customer_name)
-    
     else:
         message, status = final_no()
         
