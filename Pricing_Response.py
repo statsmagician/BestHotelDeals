@@ -45,6 +45,9 @@ def negotiate1(raw_json, cheap_hotel, cheapest_price):
 
     message = "Well, " + cheap_hotel + " down the road is charging " + cheapest_price + ", can you do something like " + str(current_price) + " dollars?"
     status = 1
+    intent = raw_json['topScoringIntent']['intent']
+    if intent == 'No':
+        message, status = final_no()
     return message, status
 
 
@@ -52,7 +55,7 @@ def negotiate2(raw_json, customer_name, current_price, original_price):
     # Second Attempt to haggle
     raw_json = json.loads(raw_json)
     intent = raw_json['topScoringIntent']['intent']
-    print(intent)
+    
 
     if intent == 'Yes':
         message, status = agreement(customer_name)
@@ -61,7 +64,6 @@ def negotiate2(raw_json, customer_name, current_price, original_price):
     else:
         sentiment =raw_json['sentimentAnalysis']['score']
         status = 1
-        print(sentiment)
         if sentiment > 0.5:
             message = "Hmm.. well that is the highest I can go."
         else:
