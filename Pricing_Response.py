@@ -1,9 +1,6 @@
 from datetime import datetime
 import json
 
-
-
-
 def ask_for_price(hotel_date):
     # hotel_date = 03-08-2019
     day_of_Month = hotel_date.split('-')
@@ -21,44 +18,42 @@ def ask_for_price(hotel_date):
     else:
         days += 'th'
 
+
     message = "Hey, I'm looking for a hotel room on the " + days + " of " + hotel_date.strftime('%B') + ". What are you guys charging per night?"
     return message
 
 
-
-
-
-
 def negotiate1(raw_json, cheap_hotel, cheapest_price):
     # First Haggle Attempt
-    raw_json = json.loads(raw_text)
+    raw_json = json.loads(raw_json)
 
     
-    pos = str(current_price).find('.')
-    cheapest_price = current_price[:pos]
+    pos = str(cheapest_price).find('.')
+    if pos > -1:
+        cheapest_price = cheapest_price[:pos]
 
     original_price = raw_json['entities'][0]['resolution']['value']
-
+    pos = str(original_price).find('.')
+    if pos > -1:
+        original_price =  str(original_price[:pos])
     current_price = str(int(original_price) * 0.8)
-       
     pos = current_price.find('.')
-    current_price = int(current_price[:pos]) 
-    current_price -= current_price%5
-
+    if pos > -1:
+        current_price = int(current_price[:pos]) 
+    current_price -= int(current_price)%5
     message = "Well, " + cheap_hotel + " down the road is charging " + cheapest_price + " dollars, can you do something like " + str(current_price) + " dollars?"
     status = 1
     intent = raw_json['topScoringIntent']['intent']
+
     if intent == 'No':
         message, status = final_no()
-    return message, status
-
+    return message, int(original_price), int(current_price), status
 
 def negotiate2(raw_json, customer_name, current_price, original_price):
     # Second Attempt to haggle
     raw_json = json.loads(raw_json)
     intent = raw_json['topScoringIntent']['intent']
     
-
     if intent == 'Yes':
         message, status = agreement(customer_name)
         status = 2
@@ -72,6 +67,7 @@ def negotiate2(raw_json, customer_name, current_price, original_price):
             message = "Alright.. Well, I'm I was really looking forward to staying there, can you meet me half way?"
             current_price = str((int(original_price) + int(current_price))/2)
             current_price = current_price[:current_price.find('.')]
+
         return message, current_price, status
 
 
@@ -79,12 +75,10 @@ def final_attempt(raw_json, customer_name):
     # This is it, just a yes or a no!
     raw_json = json.loads(raw_json)
     intent = raw_json['topScoringIntent']['intent']
-    
     if intent == 'Yes':
         message, status = agreement(customer_name)
     else:
         message, status = final_no()
-        
     return message, status
 
 
@@ -96,11 +90,12 @@ def final_no():
     status = -1
     return message, status
 
+
 def agreement(customer_name):
     message = "Perfect. I'll book it under " + customer_name
     status = 2
     return message, status
-    
+
 
 def booked():
     # Update database
