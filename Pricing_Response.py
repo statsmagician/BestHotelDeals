@@ -33,17 +33,19 @@ def negotiate1(raw_json, cheap_hotel, cheapest_price):
     # First Haggle Attempt
     raw_json = json.loads(raw_text)
 
+    
+    pos = str(current_price).find('.')
+    cheapest_price = current_price[:pos]
+
     original_price = raw_json['entities'][0]['resolution']['value']
 
-    cheap_hotel = "best Western"
-    cheapest_price = "100 dollars"
     current_price = str(int(original_price) * 0.8)
-    
+       
     pos = current_price.find('.')
     current_price = int(current_price[:pos]) 
     current_price -= current_price%5
 
-    message = "Well, " + cheap_hotel + " down the road is charging " + cheapest_price + ", can you do something like " + str(current_price) + " dollars?"
+    message = "Well, " + cheap_hotel + " down the road is charging " + cheapest_price + " dollars, can you do something like " + str(current_price) + " dollars?"
     status = 1
     intent = raw_json['topScoringIntent']['intent']
     if intent == 'No':
